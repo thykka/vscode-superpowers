@@ -1,32 +1,80 @@
+console.clear();
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
 
-console.log(vscode);
-
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
+
+class Superpowers {
+  constructor(options) {
+    const defaults = {
+      execString: '(v) => v'
+    };
+
+    Object.assign(this, defaults, options);
+  }
+
+  showInput() {
+    vscode.window.showInputBox({
+      placeHolder: this.execString,
+      value: this.execString,
+      prompt: 'Go nuts!',
+      validateInput: this._validateInput.bind(this)
+    }).then(this._processInput);
+  }
+
+  _validateInput(input) {
+    try {
+      let execFn = eval(input);
+      let selections = this._getSelections();
+      vscode.window.showInformationMessage(
+        execFn(selections[0], 0, [selections[0]])
+      );
+    } catch(e) {
+      return e.toString();
+    }
+    return '';
+  }
+
+  _getSelections() {
+    const selections = vscode.window.activeTextEditor.selections || [];
+    return selections.map(
+      selection => vscode.window.activeTextEditor.document.getText(selection)
+    );
+  }
+
+  _processInput(input) {
+    const editor = vscode.window.activeTextEditor;
+    const selections = editor.selections;
+    const document = editor.document;
+    const execFn = eval(input);
+
+    const results = selections.map(
+      selection => document.getText(selection)
+    ).map(execFn).map(String);
+
+    editor.edit((builder) => {
+      selections.forEach((selection, index) => {
+        builder.replace(selection, results[index]);
+      });
+    });
+  }
+}
+
+const superpowers = new Superpowers();
 
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "superpowers" is now active!');
+  // The commandId parameter must match the command field in package.json
+  let disposable = vscode.commands.registerCommand('extension.superpowers', () => {
+    superpowers.showInput();
+  });
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with  registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('extension.superpowers', function () {
-		// The code you place here will be executed every time your command is executed
-		const config = vscode.workspace.getConfiguration('superpowers');
-		// Display a message box to the user
-		vscode.window.showInformationMessage(config.get('configString'));
-	});
-
-	context.subscriptions.push(disposable);
+  context.subscriptions.push(disposable);
 }
 exports.activate = activate;
 
@@ -34,6 +82,6 @@ exports.activate = activate;
 function deactivate() {}
 
 module.exports = {
-	activate,
-	deactivate
+  activate,
+  deactivate
 }
