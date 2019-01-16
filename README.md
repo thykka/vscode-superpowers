@@ -4,8 +4,8 @@ This VSCode extension gives you superpowers in the form of JavaScript expression
 
 ## Preview
 
-![Superpowers](screenshots/superpowers.gif)
-![Superpresets](screenshots/superpresets.gif)
+![Superpowers](https://bitbucket.org/thykka/vscode-superpowers/raw/master/screenshots/superpowers.gif)
+![Superpresets](https://bitbucket.org/thykka/vscode-superpowers/raw/master/screenshots/superpresets.gif)
 
 ## Features
 
