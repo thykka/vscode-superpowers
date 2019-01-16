@@ -3,6 +3,7 @@
 	"displayName": "superpowers",
 	"description": "Edit your document with JavaScript functions",
 	"version": "0.0.1",
+	"publisher": "thykka",
 	"engines": {
 		"vscode": "^1.30.0"
 	},
@@ -19,11 +20,6 @@
 		"configuration": {
 			"title": "Superpowers",
 			"properties": {
-				"superpowers.testSetting": {
-					"type": "boolean",
-					"description": "Just testin",
-					"default": false
-				},
 				"superpowers.mapPresets": {
 					"type": "array",
 					"items": {
