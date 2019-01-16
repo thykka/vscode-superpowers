@@ -2,6 +2,11 @@
 
 This VSCode extension gives you superpowers in the form of JavaScript expressions, that can be used to map or sort multi-selections.
 
+## Preview
+
+![Superpowers](screenshots/superpowers.gif)
+![Superpresets](screenshots/superpresets.gif)
+
 ## Features
 
 - Perform map operations on a selection or multiple selections
