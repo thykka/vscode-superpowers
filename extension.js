@@ -4,32 +4,23 @@ class Superpowers {
   constructor(options) {
     const defaults = {
       lastMapString: '(v, i, a) => v',
-      mapPresets: {
-        'append difference between times': '(v) => { var times = v.match(/[0-9]+:[0-9]+/g).map(t => { let parts = t.split(\':\'); return parseInt(parts[0]) + (parts[1] / 60) }); return v + \' (\' + (times[1] - times[0]) + \'h)\'; }',
-        'convert UPPERCASE': '(v) => v.toUpperCase()',
-        'convert lowercase': '(v) => v.toLowerCase()',
-        'convert camelCase': '(v) => v.trim().replace(/(?:^|\\s|_|-+)(\\w)/g, (_, c, o) => o !== 0 ? c.toUpperCase() : c)',
-        'insert current time (rounded)': '() => { let now = new Date( Math.round(Date.now() / 1000 / 60 / 15) * 1000 * 60 * 15 ); return now.getHours() + \':\' + now.getMinutes() }',
-        'prefix index': '(v, i) => `${i+1}. ${v}`',
-      },
       lastSortString: '(a, b) => a - b',
-      sortPresets: {
-        'natural (alphanumeric)': `(s1, s2) => {
-          const a = s1.split(/(\\d+|\\D+)/).filter(function(s){return s!=""});
-          const b = s2.split(/(\\d+|\\D+)/).filter(function(s){return s!=""});
-          let cmp = 0;
-          for (let i = 0; 0 == cmp && i < a.length && i < b.length; i++) {
-            let n1 = a[i] - 0, n2 = b[i] - 0;
-            if (!isNaN(n1) && !isNaN(n2)) cmp = n1 - n2;
-            else if (a[i] < b[i]) cmp = -1;
-            else if (a[i] > b[i]) cmp = 1;
-          }
-          return cmp;
-        }`,
-      }
+      mapPresets: {},
+      sortPresets: {}
     };
 
+    this.configuration = vscode.workspace.getConfiguration('superpowers');
+
     Object.assign(this, defaults, options);
+
+    this.configuration.get('mapPresets').forEach(preset => {
+      this.mapPresets[preset.name] = preset.function;
+    });
+
+    this.configuration.get('sortPresets').forEach(preset => {
+      this.sortPresets[preset.name] = preset.function;
+    });
+
   }
 
   showMapInput(validate = true) {
