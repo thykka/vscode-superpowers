@@ -10,7 +10,8 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.superpowers"
+		"onCommand:extension.superpowers",
+		"onCommand:extension.superpresets"
 	],
 	"main": "./extension.js",
 	"contributes": {
@@ -29,6 +30,9 @@
 			{
 				"command": "extension.superpowers",
 				"title": "Superpowers"
+			}, {
+				"command": "extension.superpresets",
+				"title": "Superpresets"
 			}
 		]
 	},
