@@ -51,11 +51,15 @@ This extension contributes the following settings:
 
 ## Known Issues
 
-(No documented issues. Please report issues via issue tracker)
+Please report issues via [issue tracker](https://bitbucket.org/thykka/vscode-superpowers/issues?status=new&status=open)
 
 ## Release Notes
 
 Extension is still in early phases of development. Expect things to change or be broken.
+
+### 0.0.5
+
+Added screenshots
 
 ### 0.0.3
 
