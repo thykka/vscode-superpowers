@@ -3,33 +3,46 @@ const vscode = require('vscode');
 class Superpowers {
   constructor(options) {
     const defaults = {
-      lastMapString: '(v, i, a) => v',
+      lastMapString: '(value, index, array) => value',
       lastSortString: '(a, b) => a - b',
       mapPresets: {},
       sortPresets: {}
     };
-
-    this.configuration = vscode.workspace.getConfiguration('superpowers');
-
     Object.assign(this, defaults, options);
 
-    this.configuration.get('mapPresets').forEach(preset => {
+    this._loadPresets();
+  }
+
+  _loadPresets() {
+    let config = vscode.workspace.getConfiguration('superpowers');
+
+    config.get('mapPresets').forEach(preset => {
       this.mapPresets[preset.name] = preset.function;
-    });
+    }, this);
 
-    this.configuration.get('sortPresets').forEach(preset => {
+    config.get('sortPresets').forEach(preset => {
       this.sortPresets[preset.name] = preset.function;
-    });
-
+    }, this);
   }
 
   showMapInput(validate = true) {
     vscode.window.showInputBox({
+      ignoreFocusOut: true,
       placeHolder: this.lastMapString,
       value: this.lastMapString,
       prompt: 'Go nuts!',
-      validateInput: validate ? this._validateInput.bind(this) : () => {},
+      validateInput: validate ? this._validateMapInput.bind(this) : () => {},
     }).then(this._processMapInput.bind(this));
+  }
+
+  showSortInput(validate = true) {
+    vscode.window.showInputBox({
+      ignoreFocusOut: true,
+      placeHolder: this.lastSortString,
+      value: this.lastSortString,
+      prompt: 'Go nuts!',
+      validateInput: validate ? this._validateSortInput.bind(this) : () => {},
+    }).then(this._processSortInput.bind(this));
   }
 
   showMapPresets() {
@@ -58,14 +71,32 @@ class Superpowers {
     );
   }
 
-  _validateInput(input) {
+  _validateMapInput(input) {
     try {
       const mapFn = eval(input);
       const selections = this._getSelections();
-      const results = this._selectionsToText(selections);
+      const texts = this._selectionsToText(selections);
       vscode.window.showInformationMessage(
-        mapFn(results[0], 0, [...results])
+        'Map preview:',
+        ...texts.map(mapFn).map(String).slice(0, 3)
       );
+      vscode.window.setStatusBarMessage('testings', 500);
+    } catch(e) {
+      return e.toString();
+    }
+    return '';
+  }
+
+  _validateSortInput(input) {
+    try {
+      const sortFn = eval(input);
+      const selections = this._getSelections();
+      const texts = this._selectionsToText(selections);
+      vscode.window.showInformationMessage(
+        'Sort preview:',
+        ...texts.sort(sortFn).map(String).slice(0, 3)
+      );
+      vscode.window.setStatusBarMessage('testings', 500);
     } catch(e) {
       return e.toString();
     }
@@ -128,17 +159,21 @@ const superpowers = new Superpowers();
  */
 function activate(context) {
   // The commandId parameter must match the command field in package.json
-  let mapInput = vscode.commands.registerTextEditorCommand('extension.superpowers', () => {
+  let mapInput = vscode.commands.registerTextEditorCommand('superpowers.customMap', () => {
     superpowers.showMapInput();
   });
-  let mapPresets = vscode.commands.registerTextEditorCommand('extension.superpresets', () => {
+  let sortInput = vscode.commands.registerTextEditorCommand('superpowers.customSort', () => {
+    superpowers.showSortInput();
+  });
+  let mapPresets = vscode.commands.registerTextEditorCommand('superpowers.mapPresets', () => {
     superpowers.showMapPresets();
   });
-  let sortPresets = vscode.commands.registerTextEditorCommand('extension.supersorts', () => {
+  let sortPresets = vscode.commands.registerTextEditorCommand('superpowers.sortPresets', () => {
     superpowers.showSortPresets();
   });
 
   context.subscriptions.push(mapInput);
+  context.subscriptions.push(sortInput);
   context.subscriptions.push(mapPresets);
   context.subscriptions.push(sortPresets);
 }

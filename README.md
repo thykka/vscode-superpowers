@@ -14,34 +14,44 @@ This VSCode extension gives you superpowers in the form of JavaScript expression
 - Generate text via JavaScript expressions
 - Save your expressions as presets for easy access
 
-
-## Requirements
-
-none
-
 ## Usage
 
+1. Select some text. Optionally, use `Cmd` to select multiple regions.
 1. Press `Cmd` + `Shift` + `P` to open the command palette.
-1. Type "super" and choose either `Superpresets`, `Supersorts` or `Superpowers` to open a list of map presets, a list of sort presets or a map function input box, respectively.
-1. Choose a preset or write a custom function.
+1. Type "super" to show a list of available commands;
 
-## Notes
+    >### Custom map function
 
-- Custom map functions and presets receive the same parameters as native JavaScript Array.prototype.map, i.e. `value`, `index` and `array`.
-- Custom sort functions[1] and presets
+      Type a JavaScript [map callback function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map#Parameters) and press enter. Your function will get applied to each selection.
+
+    >### Map Presets
+
+      Pick a preset to use as the map function.
+
+    >### Custom sort function
+
+      Type a JavaScript [sort comparison function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#Parameters) and press enter to sort the selections.
+
+    >### Sort Presets
+
+      Pick a preset to use as the sort function.
 
 ## Extension Settings
 
 This extension contributes the following settings:
 
-* `superpowers.mapPresets`: List of map presets as an array of objects, such as:
+* `superpowers.mapPresets`: List of map presets as an array of objects.
+
+  Example:
   ```json
   {
     "name": "replace with index",
     "function": "(_, i) => i + 1"
   }
   ```
-* `superpowers.sortPresets`: List of sort presets as an array of objects, such as:
+* `superpowers.sortPresets`: List of sort presets as an array of objects.
+
+  Example:
   ```json
   {
     "name": "sort by codepoint",
@@ -51,33 +61,19 @@ This extension contributes the following settings:
 
 ## Known Issues
 
-Please report issues via [issue tracker](https://bitbucket.org/thykka/vscode-superpowers/issues?status=new&status=open)
+Please report issues via [issue tracker](https://bitbucket.org/thykka/vscode-superpowers/issues?status=new&status=open).
 
 ## Release Notes
 
 Extension is still in early phases of development. Expect things to change or be broken.
 
-### 0.0.5
 
-Added screenshots
+## Building
 
-### 0.0.3
+1. Ensure all changes have been committed.
 
-Initial publish
+1.  ```shell
+    $ vsce package
 
-### 0.0.1
-
-Initial release
-
-
-## Roadmap
-
-### Next
-
-  [ ] Add custom sort input box
-
-### Future
-
-  [ ] Add more presets
-  [ ] Streamline the UI somehow
-  [ ] Implement better preview
+    $ vsce publish [patch/major/minor]
+    ```
