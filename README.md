@@ -9,15 +9,23 @@ This VSCode extension gives you superpowers in the form of JavaScript expression
 - Generate text via JavaScript expressions
 - Save your expressions as presets for easy access
 
+
 ## Requirements
 
 none
 
+## Usage
+
+1. Press `Cmd` + `Shift` + `P` to open the command palette.
+1. Type "super" and choose either `Superpresets`, `Supersorts` or `Superpowers` to open a list of map presets, a list of sort presets or a map function input box, respectively.
+1. Choose a preset or write a custom function.
+
+## Notes
+
+- Custom map functions and presets receive the same parameters as native JavaScript Array.prototype.map, i.e. `value`, `index` and `array`.
+- Custom sort functions[1] and presets
+
 ## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
 
 This extension contributes the following settings:
 
@@ -44,6 +52,23 @@ This extension contributes the following settings:
 
 Extension is still in early phases of development. Expect things to change or be broken.
 
+### 0.0.3
+
+Initial publish
+
 ### 0.0.1
 
 Initial release
+
+
+## Roadmap
+
+### Next
+
+  [ ] Add custom sort input box
+
+### Future
+
+  [ ] Add more presets
+  [ ] Streamline the UI somehow
+  [ ] Implement better preview
