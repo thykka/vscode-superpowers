@@ -14,7 +14,9 @@
 		"onCommand:superpowers.customMap",
 		"onCommand:superpowers.customSort",
 		"onCommand:superpowers.mapPresets",
-		"onCommand:superpowers.sortPresets"
+		"onCommand:superpowers.sortPresets",
+		"onLanguage:markdown",
+		"onLanguage:plaintext"
 	],
 	"main": "./extension.js",
 	"contributes": {

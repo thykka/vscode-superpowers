@@ -67,6 +67,11 @@ Please report issues via [issue tracker](https://bitbucket.org/thykka/vscode-sup
 
 Extension is still in early phases of development. Expect things to change or be broken.
 
+## Development
+
+1. Open project in VS Code
+1. Select `Debug` > `Start Debugging [F5]`
+1. ¯\\\_(ツ)_/¯ hack away!
 
 ## Building
 

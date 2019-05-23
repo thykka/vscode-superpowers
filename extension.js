@@ -6,7 +6,75 @@ class Superpowers {
       lastMapString: '(value, index, array) => value',
       lastSortString: '(a, b) => a - b',
       mapPresets: {},
-      sortPresets: {}
+      sortPresets: {},
+      completions: [{
+        name: 'roundedTime',
+        selectors: ['markdown', 'plaintext'],
+        triggers: ['R'],
+        completionFunction: ( document, position, token, context ) => {
+          const lineText = document.lineAt(position).text;
+          const matcher = /^\s*(\d{2}:\d{2})?([\s-]+)?([RT]{1,2})?$/;
+          const matchResult = lineText.match(matcher);
+
+          if(matchResult === null) {
+            // edit operation is not interesting, let's bail...
+            token.cancel();
+            return false;
+          }
+
+          console.log(JSON.stringify(matchResult, ' ', 2));
+
+          let textPrefix = '';
+          let textSuffix = ' - ';
+          if(matchResult[1]) { // is there already a time on this row?
+            textSuffix = ' ';
+            if(matchResult[2] === ' ') {
+              textPrefix = '- ';
+            } else if(matchResult[2] === ' -') {
+              textPrefix = ' ';
+            }
+          }
+
+          let timeFunction = () => {
+            let now = new Date( Math.round(Date.now() / 1000 / 60 / 15) * 1000 * 60 * 15 );
+            return now.getHours() + ':' + ('0' + now.getMinutes()).substr(-2);
+          };
+
+          const time = timeFunction();
+          const completion = new vscode.CompletionItem('RT');
+          completion.kind = vscode.CompletionItemKind.Keyword;
+          completion.documentation = time;
+          completion.insertText = textPrefix + time + textSuffix;
+
+          return [ completion ];
+        }
+      }, {
+        name: 'timeDeltas',
+        selectors: ['markdown', 'plaintext'],
+        triggers: ['T'],
+        completionFunction: (document, position, context) => {
+          const lineText = document.lineAt(position).text;
+          const matcher = /^\s*(\d{2}:\d{2})([\s-]+)?(\d{2}:\d{2})\s*([TD]{1,2})?/;
+          const matchResult = lineText.match(matcher);
+
+          if(!matcher) {
+            // edit operation is not interesting, let's bail...
+            context.cancel();
+            return false;
+          }
+
+          const getTimeDelta = (v) => {
+            var times = v.match(/[0-9]+:[0-9]+/g).map(t => { let parts = t.split(':'); return parseInt(parts[0]) + (parts[1] / 60) }); return '(' + Math.abs(times[1] - times[0]) + 'h)';
+          }
+
+          const completion = new vscode.CompletionItem('TD');
+          completion.kind = vscode.CompletionItemKind.Keyword;
+          completion.documentation = 'Calculates deltas between times, given in format HH:MM - HH:MM';
+          completion.insertText = getTimeDelta(lineText);
+
+          return [ completion ];
+        }
+      }]
     };
     Object.assign(this, defaults, options);
 
@@ -176,6 +244,21 @@ function activate(context) {
   context.subscriptions.push(sortInput);
   context.subscriptions.push(mapPresets);
   context.subscriptions.push(sortPresets);
+
+  // Completion providers
+
+  superpowers.completions.forEach(completion => {
+    completion.selectors.forEach(selector => {
+      let currentProvider = vscode.languages.registerCompletionItemProvider(
+        selector,
+        { provideCompletionItems: completion.completionFunction },
+        completion.triggers
+      );
+
+      context.subscriptions.push(currentProvider);
+    })
+  })
+
 }
 exports.activate = activate;
 
