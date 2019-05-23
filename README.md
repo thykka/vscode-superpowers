@@ -13,8 +13,9 @@ This VSCode extension gives you superpowers in the form of JavaScript expression
 - Perform sort operations on a multiple selection
 - Generate text via JavaScript expressions
 - Save your expressions as presets for easy access
+- Support for dynamic snippets / completions
 
-## Usage
+## Map/Sort operation usage
 
 1. Select some text. Optionally, use `Cmd` to select multiple regions.
 1. Press `Cmd` + `Shift` + `P` to open the command palette.
@@ -35,6 +36,17 @@ This VSCode extension gives you superpowers in the form of JavaScript expression
     >### Sort Presets
 
       Pick a preset to use as the sort function.
+
+
+## Dynamic snippets / completion
+
+Currently, only plaintext and markdown documents are supported, and only two snippets are available;
+
+- `RT` - Inserts the current time, rounded to 15 minutes
+- `TD` - Calculates the time delta between two times
+
+Type a snippet, and the autocompletion menu should appear.
+
 
 ## Extension Settings
 

@@ -10,8 +10,8 @@ class Superpowers {
       completions: [{
         name: 'roundedTime',
         selectors: ['markdown', 'plaintext'],
-        triggers: ['R'],
-        completionFunction: ( document, position, token, context ) => {
+        triggers: ['R', 'T'],
+        completionFunction: ( document, position, token ) => {
           const lineText = document.lineAt(position).text;
           const matcher = /^\s*(\d{2}:\d{2})?([\s-]+)?([RT]{1,2})?$/;
           const matchResult = lineText.match(matcher);
@@ -51,13 +51,13 @@ class Superpowers {
       }, {
         name: 'timeDeltas',
         selectors: ['markdown', 'plaintext'],
-        triggers: ['T'],
+        triggers: ['T', 'D'],
         completionFunction: (document, position, context) => {
           const lineText = document.lineAt(position).text;
           const matcher = /^\s*(\d{2}:\d{2})([\s-]+)?(\d{2}:\d{2})\s*([TD]{1,2})?/;
           const matchResult = lineText.match(matcher);
 
-          if(!matcher) {
+          if(!matchResult) {
             // edit operation is not interesting, let's bail...
             context.cancel();
             return false;
