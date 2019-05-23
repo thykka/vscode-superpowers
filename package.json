@@ -2,7 +2,7 @@
 	"name": "superpowers",
 	"displayName": "superpowers",
 	"description": "Edit your document with JavaScript functions",
-	"version": "0.0.7",
+	"version": "0.1.0",
 	"publisher": "thykka",
 	"engines": {
 		"vscode": "^1.30.0"
