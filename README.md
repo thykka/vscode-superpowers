@@ -37,6 +37,10 @@ This VSCode extension gives you superpowers in the form of JavaScript expression
 
       Pick a preset to use as the sort function.
 
+    >### Custom reduce function
+
+      Type a JavaScript [reduce function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce#Parameters) and press enter to output the result after the selections.
+
 
 ## Dynamic snippets / completion
 
