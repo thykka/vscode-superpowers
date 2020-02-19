@@ -13,6 +13,7 @@
 	"activationEvents": [
 		"onCommand:superpowers.customMap",
 		"onCommand:superpowers.customSort",
+		"onCommand:superpowers.customReduce",
 		"onCommand:superpowers.mapPresets",
 		"onCommand:superpowers.sortPresets",
 		"onLanguage:markdown",
@@ -121,6 +122,10 @@
 			{
 				"command": "superpowers.sortPresets",
 				"title": "Superpowers - Sort presets"
+			},
+			{
+				"command": "superpowers.customReduce",
+				"title": "Superpowers - Custom Reduce function"
 			}
 		]
 	},
