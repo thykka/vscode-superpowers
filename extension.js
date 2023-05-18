@@ -5,8 +5,10 @@ class Superpowers {
     const defaults = {
       lastMapString: '(value, index, array) => value',
       lastSortString: '(a, b) => a - b',
+      lastReduceString: '(sum, num) => parseFloat(sum) + parseFloat(num)',
       mapPresets: {},
       sortPresets: {},
+      reducePresets: {},
       completions: [{
         name: 'roundedTime',
         selectors: ['markdown', 'plaintext'],
@@ -91,35 +93,39 @@ class Superpowers {
     config.get('sortPresets').forEach(preset => {
       this.sortPresets[preset.name] = preset.function;
     }, this);
+
+    config.get('reducePresets').forEach(preset => {
+      this.reducePresets[preset.name] = preset.function;
+    }, this);
   }
 
-  showMapInput(validate = true) {
+  showMapInput() {
     vscode.window.showInputBox({
       ignoreFocusOut: true,
       placeHolder: this.lastMapString,
       value: this.lastMapString,
-      prompt: 'Go nuts!',
-      validateInput: validate ? this._validateMapInput.bind(this) : () => {},
+      prompt: 'Type your map function',
+      validateInput: this._validateMapInput.bind(this)
     }).then(this._processMapInput.bind(this));
   }
 
-  showSortInput(validate = true) {
+  showSortInput() {
     vscode.window.showInputBox({
       ignoreFocusOut: true,
       placeHolder: this.lastSortString,
       value: this.lastSortString,
-      prompt: 'Go nuts!',
-      validateInput: validate ? this._validateSortInput.bind(this) : () => {},
+      prompt: 'Type your sort function',
+      validateInput: this._validateSortInput.bind(this)
     }).then(this._processSortInput.bind(this));
   }
 
-  showReduceInput(validate = true) {
+  showReduceInput() {
     vscode.window.showInputBox({
       ignoreFocusOut: true,
       placeHodler: this.lastReduceString,
       value: this.lastReduceString,
-      prompt: 'Go nuts!',
-      validateInput: validate ? this._validateReduceInput.bind(this) : () => {}
+      prompt: 'Type your reduce function',
+      validateInput: this._validateReduceInput.bind(this)
     }).then(this._processReduceInput.bind(this));
   }
 
@@ -128,8 +134,7 @@ class Superpowers {
       Object.keys(this.mapPresets),
       { canPickMany: false }
     ).then((selection) => {
-      this.lastMapString = this.mapPresets[selection];
-      this._processMapInput(this.lastMapString);
+      this._processMapInput(this.mapPresets[selection]);
     }).catch(this._showError);
   }
 
@@ -138,8 +143,16 @@ class Superpowers {
       Object.keys(this.sortPresets),
       { canPickMany: false }
     ).then((selection) => {
-      this.lastSortString = this.sortPresets[selection];
-      this._processSortInput(this.lastSortString);
+      this._processSortInput(this.sortPresets[selection]);
+    }).catch(this._showError);
+  }
+
+  showReducePresets() {
+    vscode.window.showQuickPick(
+      Object.keys(this.reducePresets),
+      { canPickMany: false }
+    ).then(selection => {
+      this._processReduceInput(this.reducePresets[selection]);
     }).catch(this._showError);
   }
 
@@ -161,25 +174,19 @@ class Superpowers {
     return this._validateInput(input, 'reduce', 'Reduce preview');
   }
 
-  _validateInput(input, arrayMethod, label, initialize) {
+  _validateInput(input, arrayMethod, label) {
     try {
-      const userFn = eval(input);
-      const selections = this._getSelections();
-      const texts = this._selectionsToText(selections);
-      const result = typeof initialize !== 'undefined'
-        ? texts[arrayMethod](userFn, initialize)
-        : texts[arrayMethod](userFn);
+      const result = this._processInput(input, arrayMethod, this._getSelections());
       if(Array.isArray(result)) {
         vscode.window.showInformationMessage(
           label,
-          ...result.map(String).slice(0, 3)
+          ...result.map(String).slice(0, 5)
         );
       } else {
         vscode.window.showInformationMessage(
           label, String(result)
         );
       }
-      vscode.window.setStatusBarMessage(arrayMethod, 500);
     } catch(e) {
       return e.toString();
     }
@@ -198,25 +205,37 @@ class Superpowers {
   }
 
   _processMapInput(input) {
-    this._processInput(input, 'map');
+    const selections = this._getSelections();
+    const result = this._processInput(input, 'map', selections);
+    this._insertResult(result, selections);
   }
   _processSortInput(input) {
-    this._processInput(input, 'sort');
+    const selections = this._getSelections();
+    const result = this._processInput(input, 'sort', selections);
+    this._insertResult(result, selections);
   }
   _processReduceInput(input) {
-    this._processInput(input, 'reduce', {});
+    const selections = this._getSelections();
+    const result = this._processInput(input, 'reduce', selections);
+    this._insertResult(result, selections);
   }
 
-  _processInput(input, arrayMethod, initialize) {
+  _processInput(input, arrayMethod, selections) {
+    // Save current input
+    this[`last${arrayMethod[0].toUpperCase() + arrayMethod.slice(1)}String`] = input;
     const userFn = eval(input);
-    const selections = this._getSelections();
     const texts = this._selectionsToText(selections);
-    const result = typeof initialize !== 'undefined'
-      ? texts[arrayMethod](userFn, null)
-      : texts[arrayMethod](userFn);
+    const result = texts[arrayMethod](userFn);
+    if (result && typeof result === 'object' && !Array.isArray(result)) {
+      return JSON.stringify(result, null, 2);
+    }
+    return result;
+  }
 
+  _insertResult(result, selections) {
+    const { activeTextEditor } = vscode.window;
     if(Array.isArray(result) && selections.length === result.length) {
-      vscode.window.activeTextEditor.edit((builder) => {
+      activeTextEditor.edit((builder) => {
         selections.forEach((selection, index) => {
           builder.replace(selection, String(result[index]));
         })
@@ -224,43 +243,18 @@ class Superpowers {
     } else {
       // Result and selections counts don't match,
       // append result after last selection
-      vscode.window.activeTextEditor.edit((builder) => {
-        builder.insert(vscode.window.activeTextEditor.selection.end, String(result));
+      const resultString = String(result);
+      const lastSelection = activeTextEditor.selection;
+      activeTextEditor.edit(builder => {
+        builder.insert(lastSelection.end, ' ' + resultString);
+      }).then(() => {
+        const newPosition = lastSelection.end.translate(0, 1 + resultString.length);
+        const newSelection = new vscode.Selection(lastSelection.end.translate(0, 1), newPosition);
+        activeTextEditor.selection = newSelection;
       });
     }
-
-    this[`last${ arrayMethod[0].toUpperCase() + arrayMethod.slice(1) }String`] = input;
-  }
-/*
-  _processMapInput(input) {
-    const mapFn = eval(input);
-    const selections = this._getSelections();
-
-    const results = this._selectionsToText(selections).map(mapFn).map(String);
-
-    vscode.window.activeTextEditor.edit((builder) => {
-      selections.forEach((selection, index) => {
-        builder.replace(selection, results[index]);
-      });
-    });
-
-    this.lastMapString = input;
   }
 
-  _processSortInput(input) {
-    const sortFn = eval(input);
-    const selections = this._getSelections();
-    const texts = this._selectionsToText(selections);
-    const sorted = texts.sort(sortFn);
-    vscode.window.activeTextEditor.edit((builder) => {
-      selections.forEach((selection, index) => {
-        builder.replace(selection, sorted[index]);
-      });
-    });
-
-    this.lastSortString = input;
-  }
-*/
   _sortSelections(a, b) {
     if(a.start.line !== b.start.line) {
       return a.start.line - b.start.line;
@@ -292,12 +286,16 @@ function activate(context) {
   let sortPresets = vscode.commands.registerTextEditorCommand('superpowers.sortPresets', () => {
     superpowers.showSortPresets();
   });
+  let reducePresets = vscode.commands.registerTextEditorCommand('superpowers.reducePresets', () => {
+    superpowers.showReducePresets();
+  });
 
   context.subscriptions.push(mapInput);
   context.subscriptions.push(sortInput);
   context.subscriptions.push(reduceInput);
   context.subscriptions.push(mapPresets);
   context.subscriptions.push(sortPresets);
+  context.subscriptions.push(reducePresets);
 
   // Completion providers
 
