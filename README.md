@@ -108,6 +108,8 @@ Extension is still in early phases of development. Expect things to change or be
 1. Ensure all changes have been committed.
 
 1.  ```shell
+    $ npm i -g vsce
+
     $ vsce package
 
     $ vsce publish [patch/major/minor]
