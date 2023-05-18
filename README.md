@@ -4,13 +4,14 @@ This VSCode extension gives you superpowers in the form of JavaScript expression
 
 ## Preview
 
-![Superpowers](https://bitbucket.org/thykka/vscode-superpowers/raw/master/screenshots/superpowers.gif)
-![Superpresets](https://bitbucket.org/thykka/vscode-superpowers/raw/master/screenshots/superpresets.gif)
+![Superpowers](./raw/master/screenshots/superpowers.gif)
+![Superpresets](./raw/master/screenshots/superpresets.gif)
 
 ## Features
 
 - Perform map operations on a selection or multiple selections
-- Perform sort operations on a multiple selection
+- Perform sort operations on multiple selections
+- Perform reduce operations on multiple selections
 - Generate text via JavaScript expressions
 - Save your expressions as presets for easy access
 - Support for dynamic snippets / completions
@@ -40,6 +41,10 @@ This VSCode extension gives you superpowers in the form of JavaScript expression
     >### Custom reduce function
 
       Type a JavaScript [reduce function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce#Parameters) and press enter to output the result after the selections.
+
+    >### Sort Presets
+
+      Pick a preset to use as the reduce function.
 
 
 ## Dynamic snippets / completion
@@ -74,10 +79,19 @@ This extension contributes the following settings:
     "function": "(a, b) => a.charCodeAt(0) - b.charCodeAt(0)"
   }
   ```
+* `superpowers.reducePresets`: List of reduce presets as an array of objects.
+
+  Example:
+  ```json
+  {
+    "name": "sum numbers",
+    "function": "(sum, val) => parseFloat(sum) + parseFloat(val)"
+  }
+  ```
 
 ## Known Issues
 
-Please report issues via [issue tracker](https://bitbucket.org/thykka/vscode-superpowers/issues?status=new&status=open).
+Please report issues via [issue tracker](https://github.com/thykka/vscode-superpowers/issues).
 
 ## Release Notes
 
